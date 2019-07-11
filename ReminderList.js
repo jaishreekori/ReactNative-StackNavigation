@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text, StyleSheet, AsyncStorage } from 'react-native';
-// import AsyncStorage from '@react-native-community/async-storage';
+import { View, FlatList, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { StackActions, NavigationActions } from 'react-navigation';
 
 export default class ReminderList extends Component {
@@ -11,6 +11,7 @@ export default class ReminderList extends Component {
         }
     }
     componentDidMount() {
+         this.getData()
         let task = this.props.navigation.state.params.tasks;
         let allTasks = this.state.tasks;
         allTasks.push(task);
@@ -19,16 +20,31 @@ export default class ReminderList extends Component {
     getData = async () => {
         try {
             const value = await AsyncStorage.getItem('tasks')
+            console.log('test'+ value)
             if (value !== null) {
-                this.setState({ tasks: value })
+                this.setState({ tasks: [JSON.parse(value)] })
             }
         } catch (e) {
             alert(e)
         }
     }
-
+    deleteTask = i => {
+        this.setState(
+            prevState => {
+                let tasks = prevState.tasks.slice();
+                tasks.splice(i, 1);
+                return { tasks: tasks };
+            },
+            // () => Tasks.save(this.state.tasks)
+        );
+    };
+    viewReminder = (data) => {
+        this.props.navigation.navigate('Details', { info: data })
+    }
+    editReminder = (data) => {
+        this.props.navigation.navigate('Reminder', { info: data })
+    }
     render() {
-
         return (
             <View style={styles.container}>
                 <Text style={styles.heading}>
@@ -37,7 +53,7 @@ export default class ReminderList extends Component {
                 <FlatList
                     style={styles.list}
                     data={this.state.tasks}
-                    renderItem={({ item }) =>
+                    renderItem={({ item, index }) =>
                         <View style={{ flexDirection: 'row', alignItems: 'center', width: "100%" }}>
                             <View style={styles.listItemCont}>
                                 <Text style={styles.listItem}>
@@ -49,6 +65,21 @@ export default class ReminderList extends Component {
                                 <Text style={styles.listItem}>
                                     Time: {item.chosenAndroidTime}
                                 </Text>
+                            </View>
+
+                            <View style={{ flexDirection: 'column' }}>
+                                <TouchableOpacity style={{ height: 25, width: 50, backgroundColor: 'purple', marginLeft: 30, marginBottom: 7 }}
+                                    onPress={() => this.viewReminder(item)}>
+                                    <Text style={styles.buttonView}>View</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ height: 25, width: 50, backgroundColor: 'blue', marginLeft: 30, marginBottom: 7 }}
+                                    onPress={() => this.editReminder(item)}>
+                                    <Text style={styles.buttonView}>Edit</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ height: 25, width: 50, backgroundColor: 'red', marginLeft: 30 }}
+                                    onPress={() => this.deleteTask(index)}>
+                                    <Text style={styles.buttonView}>Delete</Text>
+                                </TouchableOpacity>
                             </View>
                             {/* <TouchableOpacity
                                     style={{ height: 20, width: 20, marginLeft: 5 }}
@@ -77,6 +108,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'flex-start',
     },
+    buttonView: {
+        fontSize: 15,
+        color: 'white',
+        alignSelf: 'center'
+    },
     heading: {
         color: 'black',
         fontFamily: 'Helvetica',
@@ -94,13 +130,14 @@ const styles = StyleSheet.create({
     listItem: {
         margin: 5,
         fontSize: 18,
+        color: 'black'
     },
     hr: {
         height: 1,
-        backgroundColor: "black"
+        backgroundColor: 'black'
     },
     listItemCont: {
-        width: "92%",
+        width: "70%",
         flexDirection: "column",
         borderWidth: 2,
         marginBottom: 20,
