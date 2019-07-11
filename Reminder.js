@@ -99,6 +99,13 @@ export default class Reminder extends Component {
         AsyncStorage.setItem('tasks', value);
         console.log(this.state.tasks)
     }
+    saveData() {
+        let task = this.getReminder();
+        alert(JSON.stringify(task));
+        this.props.navigation.navigate('ReminderList', {
+            tasks: task
+        });
+    }
     render() {
         return (
             <View style={styles.container}>
@@ -122,9 +129,7 @@ export default class Reminder extends Component {
                 </TouchableOpacity>
                 <TouchableOpacity style={{ height: 40, width: "40%", borderWidth: 2, backgroundColor: 'green', marginTop: 50, alignSelf: 'center' }}
                     onPress={() => {
-                        this.props.navigation.navigate('ReminderList', {
-                            tasks:this.state.tasks
-                        });
+                        this.saveData()
                     }}>
                     <Text style={{ fontSize: 19, fontWeight: 'bold', margin: 10, alignContent: 'center' }}>Go To Reminder</Text>
                 </TouchableOpacity>
