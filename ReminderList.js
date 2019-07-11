@@ -7,71 +7,50 @@ export default class ReminderList extends Component {
     constructor() {
         super();
         this.state = {
-            tasks: [],
-            data: ''
+            tasks: []
         }
     }
     componentDidMount() {
-        this.getData();
-        // AsyncStorage.getItem('tasks').then((value) => this.setState({ tasks: value }))
+        let task = this.props.navigation.state.params.tasks;
+        let allTasks = this.state.tasks;
+        allTasks.push(task);
+        this.setState({ tasks: allTasks });
     }
     getData = async () => {
         try {
             const value = await AsyncStorage.getItem('tasks')
-            console.log("getData " + value)
-            this.setState({ data: value })
             if (value !== null) {
-                // value previously stored
-                // this.setState({ tasks: value })
-                // setTimeout(() => {
-                //     console.log("getData1 " + JSON.stringify(value))
-                // }, 50);
+                this.setState({ tasks: value })
             }
         } catch (e) {
-            // error reading value
-            console.log(e)
+            alert(e)
         }
     }
 
     render() {
-        const { navigation } = this.props;
-        const tasks = navigation.getParam('tasks', [])
-        // const androidDate = navigation.getParam('androidDate')
-        // const chosenAndroidTime = navigation.getParam('chosenAndroidTime')
-        // const text = navigation.getParam('text')
+
         return (
             <View style={styles.container}>
                 <Text style={styles.heading}>
                     Upcoming Reminders
                 </Text>
-                {
-                    tasks.map((item) => {
-                        return (
-                            <View>
-                                <Text>{item.androidDate}</Text>
-                                <Text>{item.chosenAndroidTime}</Text>
-                                <Text>{item.text}</Text>
-                            </View>
-                        )
-                    })
-                }
-                {/* <FlatList
+                <FlatList
                     style={styles.list}
-                    data={this.state.data}
-                    renderItem={({ item, index }) =>
+                    data={this.state.tasks}
+                    renderItem={({ item }) =>
                         <View style={{ flexDirection: 'row', alignItems: 'center', width: "100%" }}>
                             <View style={styles.listItemCont}>
                                 <Text style={styles.listItem}>
-                                    Task:  {JSON.stringify(text)}
+                                    Task:  {item.text}
                                 </Text>
                                 <Text style={styles.listItem}>
-                                    Date:  {JSON.stringify(androidDate)}
+                                    Date: {item.androidDate}
                                 </Text>
                                 <Text style={styles.listItem}>
-                                    Time:  {JSON.stringify(chosenAndroidTime)}
+                                    Time: {item.chosenAndroidTime}
                                 </Text>
-                            </View> */}
-                {/* <TouchableOpacity
+                            </View>
+                            {/* <TouchableOpacity
                                     style={{ height: 20, width: 20, marginLeft: 5 }}
                                     onPress={() => this.checkViewMethod(item, index)}>
                                     {item.isSelected === true ?
@@ -81,11 +60,11 @@ export default class ReminderList extends Component {
                                         <View style={{ height: 20, width: 20, borderColor: 'black', borderWidth: 3, marginLeft: 5 }}></View>
                                     }
                                 </TouchableOpacity> */}
-                {/* <View style={styles.hr} />
+                            <View style={styles.hr} />
                         </View>}
                     extraData={this.state}
                     keyExtractor={(item, index) => index.toString()}
-                /> */}
+                />
             </View>
         );
     }
