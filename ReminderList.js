@@ -29,13 +29,11 @@ export default class ReminderList extends Component {
         }
     }
     deleteTask = (i) => {
-        this.setState(
-            prevState => {
-                let tasks = prevState.tasks.slice();
-                tasks.splice(i, 1);
-                return { tasks: tasks };
-            },
-        );
+        let tasks = this.state.tasks;
+        if (i > -1) {
+            tasks.splice(i, 1);
+        }
+        this.setState({ tasks: tasks });
         AsyncStorage.setItem('tasks', JSON.stringify(this.state.tasks))
     };
     viewReminder = (data) => {
